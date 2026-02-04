@@ -60,6 +60,7 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
+app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/url', urlRoutes);
 
 // Redirect route (must be after API routes to avoid conflicts)

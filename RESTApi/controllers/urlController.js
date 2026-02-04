@@ -16,8 +16,8 @@ const createShortUrl = async (req, res, next) => {
         const { originalUrl, customAlias, expiresIn } = req.body;
         const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
 
-        // Check if URL already exists (to handle duplicates)
-        const existingUrl = await Url.findOne({ originalUrl });
+        // Check if URL already exists for this user
+        const existingUrl = await Url.findOne({ originalUrl, user: req.user._id });
         if (existingUrl && !customAlias) {
             return res.status(200).json({
                 success: true,
@@ -71,6 +71,7 @@ const createShortUrl = async (req, res, next) => {
             shortCode,
             customAlias: customAlias ? customAlias.toLowerCase() : null,
             expiresAt,
+            user: req.user._id
         });
 
         // Build the short URL

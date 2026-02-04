@@ -47,6 +47,13 @@ const urlSchema = new mongoose.Schema({
         type: Date,
         default: null,
     },
+
+    // Reference to the user who created the URL
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 
 // Compound index for faster lookups

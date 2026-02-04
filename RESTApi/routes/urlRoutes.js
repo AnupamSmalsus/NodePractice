@@ -14,15 +14,17 @@ const {
 
 const { urlValidationRules, validate } = require('../middlewares/validateUrl');
 const { createUrlLimiter } = require('../middlewares/rateLimiter');
+const { protect } = require('../middlewares/authMiddleware');
 
 /**
  * @route   POST /api/url
  * @desc    Create a new short URL
- * @access  Public
+ * @access  Private
  * @body    { originalUrl: string, customAlias?: string, expiresIn?: number }
  */
 router.post(
     '/',
+    protect,
     createUrlLimiter,
     urlValidationRules,
     validate,
@@ -32,9 +34,9 @@ router.post(
 /**
  * @route   GET /api/url/:shortId
  * @desc    Get URL analytics (original URL, created date, visit count)
- * @access  Public
+ * @access  Private
  * @params  shortId - The short code or custom alias
  */
-router.get('/:shortId', getUrlAnalytics);
+router.get('/:shortId', protect, getUrlAnalytics);
 
 module.exports = router;
