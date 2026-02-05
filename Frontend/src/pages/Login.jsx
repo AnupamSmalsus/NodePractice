@@ -95,6 +95,9 @@ const Login = () => {
                 <p style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     Don't have an account? <Link to="/signup" style={{ color: 'var(--color-primary-light)' }}>Sign up</Link>
                 </p>
+                <p style={{ marginTop: '0.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <Link to="/forgot-password" style={{ color: 'var(--color-primary-light)' }}>Forgot password?</Link>
+                </p>
             </div>
         </div>
     );

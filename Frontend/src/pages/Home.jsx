@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../App.css';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000';
@@ -427,6 +427,10 @@ function Home() {
                     <a href="http://localhost:3000/health" target="_blank" rel="noopener noreferrer">
                         {' '}API Status
                     </a>
+                    {' '}•
+                    <Link to="/profile" style={{ color: 'var(--color-primary-light)' }}>
+                        {' '}Edit Profile
+                    </Link>
                 </p>
             </footer>
         </div>

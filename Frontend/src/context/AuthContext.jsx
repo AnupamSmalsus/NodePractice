@@ -71,8 +71,26 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const updateUsername = async (username) => {
+        try {
+            const token = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : null;
+            const { data } = await api.put('/username', { username }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // Update stored user info
+            localStorage.setItem('userInfo', JSON.stringify(data));
+            setUser(data);
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Update username failed'
+            };
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, signup, googleLogin, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, signup, googleLogin, logout, updateUsername, loading }}>
             {children}
         </AuthContext.Provider>
     );

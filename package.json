@@ -4,11 +4,11 @@
   "description": "Full-stack URL Shortener with React frontend and Node.js backend",
   "scripts": {
     "start": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend\" --names \"API,UI\" --prefix-colors \"yellow,cyan\"",
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend\" --names \"API,UI\" --prefix-colors \"yellow,cyan\" vite --open",
     "frontend": "cd Frontend && npm run dev",
-    "backend": "cd RESTApi && npm start",
-    "backend:dev": "cd RESTApi && npm run dev",
-    "install:all": "npm install && cd Frontend && npm install && cd ../RESTApi && npm install"
+    "backend": "cd Backend && npm start",
+    "backend:dev": "cd Backend && npm run dev",
+    "install:all": "npm install && cd Frontend && npm install && cd ../Backend && npm install"
   },
   "keywords": [
     "url-shortener",

@@ -59,6 +59,14 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Root endpoint (basic status)
+app.get('/', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Welcome to the URL Shortener API',
+    });
+});
+
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/url', urlRoutes);
