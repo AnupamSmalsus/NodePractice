@@ -7,18 +7,26 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
     const { signup } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccess('');
+        setLoading(true);
+
         const result = await signup(username, email, password);
+
         if (result.success) {
-            navigate('/');
+            setSuccess('Account created successfully! Redirecting to login...');
+            setTimeout(() => navigate('/login'), 2000);
         } else {
             setError(result.message);
         }
+        setLoading(false);
     };
 
     return (
@@ -33,6 +41,7 @@ const Signup = () => {
                     Create Account
                 </h2>
 
+                {success && <div className="success-bg" style={{ padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>{success}</div>}
                 {error && <div className="error-bg error" style={{ padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>{error}</div>}
 
                 <form onSubmit={handleSubmit}>
@@ -45,6 +54,7 @@ const Signup = () => {
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Choose a username"
                             required
+                            disabled={loading || success}
                         />
                     </div>
 
@@ -57,6 +67,7 @@ const Signup = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
                             required
+                            disabled={loading || success}
                         />
                     </div>
 
@@ -69,11 +80,12 @@ const Signup = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Create a password"
                             required
+                            disabled={loading || success}
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                        Sign Up
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading || success}>
+                        {loading ? 'Creating Account...' : 'Sign Up'}
                     </button>
                 </form>
 

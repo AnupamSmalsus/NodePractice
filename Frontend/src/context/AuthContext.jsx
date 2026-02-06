@@ -40,9 +40,8 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (username, email, password) => {
         try {
-            const { data } = await api.post('/signup', { username, email, password });
-            localStorage.setItem('userInfo', JSON.stringify(data));
-            setUser(data);
+            await api.post('/signup', { username, email, password });
+            // Don't auto-login, just return success
             return { success: true };
         } catch (error) {
             return {
