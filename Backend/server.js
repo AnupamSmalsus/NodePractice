@@ -16,9 +16,13 @@ const { notFoundHandler, errorHandler } = require('./middlewares/errorHandler');
 // Import routes
 const urlRoutes = require('./routes/urlRoutes');
 const redirectRoute = require('./routes/redirectRoute');
+const statsRoutes = require('./routes/statsRoutes');
 
 // Initialize Express app
 const app = express();
+
+// Trust proxy for correct IP detection (especially when behind reverse proxy)
+app.set('trust proxy', true);
 
 // Connect to MongoDB
 connectDB();
@@ -70,6 +74,7 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/url', urlRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Redirect route (must be after API routes to avoid conflicts)
 app.use('/', redirectRoute);

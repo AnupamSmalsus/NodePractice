@@ -53,7 +53,16 @@ const urlSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+
+    // Analytics: array of visits with metadata
+    visits: [{
+        timestamp: { type: Date, default: Date.now },
+        country: { type: String, default: 'Unknown' },
+        userType: { type: String, enum: ['desktop', 'mobile', 'tablet', 'unknown'], default: 'unknown' },
+        ip: { type: String },
+        userAgent: { type: String }
+    }]
 });
 
 // Compound index for faster lookups
@@ -72,11 +81,19 @@ urlSchema.methods.isExpired = function () {
 };
 
 /**
- * Increment the visit count
+ * Increment the visit count and record analytics
+ * @param {Object} analytics - { country, userType, ip, userAgent }
  * @returns {Promise} Updated document
  */
-urlSchema.methods.incrementVisitCount = async function () {
+urlSchema.methods.incrementVisitCount = async function (analytics = {}) {
     this.visitCount += 1;
+    this.visits.push({
+        timestamp: new Date(),
+        country: analytics.country || 'Unknown',
+        userType: analytics.userType || 'unknown',
+        ip: analytics.ip,
+        userAgent: analytics.userAgent
+    });
     return this.save();
 };
 

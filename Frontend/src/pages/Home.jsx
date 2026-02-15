@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import '../App.css';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
+import ChatBot from '../components/ChatBot';
 
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000';
@@ -43,15 +44,46 @@ function Home() {
     // Track if custom alias was manually edited by user
     const [isAliasManuallyEdited, setIsAliasManuallyEdited] = useState(false);
 
-    // Load history from localStorage on mount (scoped by user email for simple isolation)
+    // Load user URLs from backend on mount
     useEffect(() => {
-        if (user?.email) {
-            const savedHistory = localStorage.getItem(`urlHistory_${user.email}`);
-            if (savedHistory) {
-                setHistory(JSON.parse(savedHistory));
-            }
+        if (user?.token) {
+            const fetchUserUrls = async () => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/url/my-urls`, {
+                        headers: {
+                            'Authorization': `Bearer ${user.token}`
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        setHistory(data.data);
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch user URLs:', err);
+                }
+            };
+            fetchUserUrls();
         }
     }, [user]);
+
+    // Helper to refresh URLs after creation
+    const refreshUrls = async () => {
+        if (user?.token) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/url/my-urls`, {
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setHistory(data.data);
+                }
+            } catch (err) {
+                console.error('Failed to refresh URLs:', err);
+            }
+        }
+    };
 
     // Auto-generate alias from URL
     const generateAlias = (url) => {
@@ -92,13 +124,9 @@ function Home() {
         setIsAliasManuallyEdited(true);
     };
 
-    // Save history to localStorage
+    // Save to history (now just adds to local state; backend is source of truth)
     const saveToHistory = (urlData) => {
-        const newHistory = [urlData, ...history].slice(0, 10); // Keep last 10 items
-        setHistory(newHistory);
-        if (user?.email) {
-            localStorage.setItem(`urlHistory_${user.email}`, JSON.stringify(newHistory));
-        }
+        setHistory(prev => [urlData, ...prev]);
     };
 
     // Handle form submission
@@ -135,7 +163,7 @@ function Home() {
             }
 
             setResult(data.data);
-            saveToHistory(data.data);
+            await refreshUrls(); // Refresh the list after creation
 
             // Reset form
             setOriginalUrl('');
@@ -433,6 +461,9 @@ function Home() {
                     </Link>
                 </p>
             </footer>
+
+            {/* ChatBot */}
+            {user && <ChatBot user={user} />}
         </div>
     );
 }

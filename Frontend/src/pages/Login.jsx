@@ -1,15 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const Login = () => {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [stats, setStats] = useState({ urlsCreated: 0, clicksTracked: 0, uptime: '99.9%' });
     const { login, googleLogin } = useAuth();
     const navigate = useNavigate();
+
+    // Fetch stats on mount
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const { data } = await axios.get('http://localhost:3000/api/stats');
+                console.log('Stats from API:', data);
+                setStats(data);
+            } catch (err) {
+                console.error('Failed to fetch stats', err);
+            }
+        };
+        fetchStats();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,124 +66,13 @@ const Login = () => {
     return (
         <div style={{
             display: 'flex',
+            flexDirection: 'column',
             minHeight: '100vh',
             width: '100%'
         }}>
-            {/* Left Side - App Info */}
+            {/* Right Side - Login Form (now top) */}
             <div style={{
-                flex: 1,
-                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                padding: '3rem',
-                position: 'relative',
-                overflow: 'hidden'
-            }}>
-                {/* Background decoration */}
-                <div style={{
-                    position: 'absolute',
-                    top: '-50%',
-                    left: '-50%',
-                    width: '200%',
-                    height: '200%',
-                    background: 'radial-gradient(circle at 30% 70%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
-                    pointerEvents: 'none'
-                }} />
-
-                <div style={{ position: 'relative', zIndex: 1, maxWidth: '500px' }}>
-                    {/* Logo/Brand */}
-                    <div style={{ marginBottom: '2rem' }}>
-                        <span style={{ fontSize: '3rem' }}>🔗</span>
-                        <h1 style={{
-                            fontSize: '2.5rem',
-                            fontWeight: 'bold',
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            marginTop: '0.5rem'
-                        }}>
-                            URL Shortener
-                        </h1>
-                    </div>
-
-                    {/* Tagline */}
-                    <p style={{
-                        fontSize: '1.25rem',
-                        color: 'var(--text-secondary)',
-                        lineHeight: 1.6,
-                        marginBottom: '2.5rem'
-                    }}>
-                        Transform long, ugly URLs into short, memorable links.
-                        Track performance, analyze traffic, and share with confidence.
-                    </p>
-
-                    {/* Features Grid */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: '1.25rem'
-                    }}>
-                        {features.map((feature, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    borderRadius: '12px',
-                                    padding: '1.25rem',
-                                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
-                                <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '0.5rem' }}>
-                                    {feature.icon}
-                                </span>
-                                <h3 style={{
-                                    fontSize: '1rem',
-                                    fontWeight: '600',
-                                    color: 'var(--text-primary)',
-                                    marginBottom: '0.25rem'
-                                }}>
-                                    {feature.title}
-                                </h3>
-                                <p style={{
-                                    fontSize: '0.85rem',
-                                    color: 'var(--text-muted)',
-                                    margin: 0
-                                }}>
-                                    {feature.desc}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Stats */}
-                    <div style={{
-                        display: 'flex',
-                        gap: '2rem',
-                        marginTop: '2.5rem',
-                        paddingTop: '2rem',
-                        borderTop: '1px solid rgba(255, 255, 255, 0.1)'
-                    }}>
-                        <div>
-                            <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>10K+</div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>URLs Created</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>50K+</div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Clicks Tracked</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>99.9%</div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Uptime</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Right Side - Login Form */}
-            <div style={{
-                flex: 1,
+                flex: '0 0 auto',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -244,6 +149,123 @@ const Login = () => {
                             Create one for free
                         </Link>
                     </p>
+                </div>
+            </div>
+
+            {/* Left Side - App Info (now below, full width) */}
+            <div style={{
+                flex: 1,
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '3rem',
+                position: 'relative',
+                overflow: 'hidden',
+                width: '100%'
+            }}>
+                {/* Background decoration */}
+                <div style={{
+                    position: 'absolute',
+                    top: '-50%',
+                    left: '-50%',
+                    width: '200%',
+                    height: '200%',
+                    background: 'radial-gradient(circle at 30% 70%, rgba(102, 126, 234, 0.1) 0%, transparent 50%)',
+                    pointerEvents: 'none'
+                }} />
+
+                <div style={{ position: 'relative', zIndex: 1, maxWidth: '800px', width: '100%' }}>
+                    {/* Logo/Brand */}
+                    <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                        <span style={{ fontSize: '3rem' }}>🔗</span>
+                        <h1 style={{
+                            fontSize: '2.5rem',
+                            fontWeight: 'bold',
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            marginTop: '0.5rem'
+                        }}>
+                            URL Shortener
+                        </h1>
+                    </div>
+
+                    {/* Tagline */}
+                    <p style={{
+                        fontSize: '1.25rem',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.6,
+                        marginBottom: '2.5rem',
+                        textAlign: 'center'
+                    }}>
+                        Transform long, ugly URLs into short, memorable links.
+                        Track performance, analyze traffic, and share with confidence.
+                    </p>
+
+                    {/* Features Grid */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                        gap: '1.25rem'
+                    }}>
+                        {features.map((feature, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    borderRadius: '12px',
+                                    padding: '1.25rem',
+                                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '0.5rem' }}>
+                                    {feature.icon}
+                                </span>
+                                <h3 style={{
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    color: 'var(--text-primary)',
+                                    marginBottom: '0.25rem'
+                                }}>
+                                    {feature.title}
+                                </h3>
+                                <p style={{
+                                    fontSize: '0.85rem',
+                                    color: 'var(--text-muted)',
+                                    margin: 0
+                                }}>
+                                    {feature.desc}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Stats - now dynamic */}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: '2rem',
+                        marginTop: '2.5rem',
+                        paddingTop: '2rem',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                        flexWrap: 'wrap'
+                    }}>
+                        <div>
+                            <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>{stats.urlsCreated.toLocaleString()}</div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>URLs Created</div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>{stats.clicksTracked.toLocaleString()}</div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Clicks Tracked</div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>{stats.uptime}</div>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Uptime</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
